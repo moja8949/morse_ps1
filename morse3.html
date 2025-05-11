@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Reality is also pizza</title>
+  <!-- Pretendard Medium 폰트 적용 -->
+  <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Pretendard', sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+
+    h1 {
+      font-size: 3em;
+      margin-bottom: 40px;
+      font-weight: 500;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 18px;
+      width: 320px;
+      background: #000;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 10px;
+      text-align: center;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+      background: #000;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s ease;
+      font-family: 'Pretendard', sans-serif;
+    }
+
+    button:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    #morseDisplay {
+      margin-top: 50px;
+      min-height: 100px;
+      font-size: 50px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .dot, .dash {
+      opacity: 0;
+      animation: fade 0.4s ease-out forwards;
+      color: white;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: scale(0.6); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+  <h1>Reality is also pizza</h1>
+  <input id="textInput" placeholder="Type something..." />
+  <div>
+    <button onclick="playMorse()">MORSE</button>
+  </div>
+
+  <div id="morseDisplay"></div>
+
+  <script>
+    const morseMap = {
+      'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..',
+      'E': '.', 'F': '..-.', 'G': '--.', 'H': '....',
+      'I': '..', 'J': '.---', 'K': '-.-', 'L': '.-..',
+      'M': '--', 'N': '-.', 'O': '---', 'P': '.--.',
+      'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-',
+      'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-',
+      'Y': '-.--', 'Z': '--..', ' ': '/'
+    };
+
+    function toMorse(text) {
+      return text.toUpperCase().split('').map(ch => morseMap[ch] || '').join(' ');
+    }
+
+    function playBeep(duration) {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.frequency.value = 750;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration / 1000);
+      osc.stop(ctx.currentTime + duration / 1000);
+    }
+
+    async function playMorse() {
+      const input = document.getElementById("textInput").value;
+      const morse = toMorse(input);
+      console.log("모스부호:", morse);
+
+      const display = document.getElementById("morseDisplay");
+      display.innerHTML = '';
+
+      for (const char of morse) {
+        let span = document.createElement('span');
+
+        if (char === '.') {
+          span.className = 'dot';
+          span.textContent = '●';
+          display.appendChild(span);
+          playBeep(200);
+          await new Promise(r => setTimeout(r, 400));
+        } else if (char === '-') {
+          span.className = 'dash';
+          span.textContent = '―';
+          display.appendChild(span);
+          playBeep(600);
+          await new Promise(r => setTimeout(r, 800));
+        } else if (char === ' ') {
+          await new Promise(r => setTimeout(r, 600));
+        } else if (char === '/') {
+          await new Promise(r => setTimeout(r, 1400));
+        }
+      }
+    }
+  </script>
+</body>
+</html>
